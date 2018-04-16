@@ -2,6 +2,7 @@ package com.bignerdranch.android.nerdlauncher;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -12,12 +13,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -65,14 +64,24 @@ public class NerdLauncherFragment extends Fragment {
         }
     }
 
-    public class ActivityHolder extends RecyclerView.ViewHolder {
+    public class ActivityHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ResolveInfo mResolveInfo;
         private TextView mNameTextView;
 
-        public ActivityHolder(View itemView) {
+        @Override
+        public void onClick(View view) {
+            ActivityInfo activityInfo = mResolveInfo.activityInfo;
+            Intent i = new Intent(Intent.ACTION_MAIN)
+                    .setClassName(activityInfo.applicationInfo.packageName, activityInfo.name)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        }
+
+        ActivityHolder(View itemView) {
             super(itemView);
             mNameTextView = (TextView) itemView;
+            mNameTextView.setOnClickListener(this);
         }
 
         public void bindActivity(ResolveInfo resolveInfo) {
@@ -91,7 +100,7 @@ public class NerdLauncherFragment extends Fragment {
 
         private final List<ResolveInfo> mActivities;
 
-        public ActivityAdapter(List<ResolveInfo> activities) {
+        ActivityAdapter(List<ResolveInfo> activities) {
             mActivities = activities;
         }
 
